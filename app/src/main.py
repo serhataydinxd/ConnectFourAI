@@ -14,7 +14,7 @@ def main():
             col = int(input("Choose a column (0-6): "))
         else:
             print("AI choosing move...")
-            col, _ = minimax(board, 2, -99999999, 99999999, True)
+            col, _ = minimax(board, 4, -99999999, 99999999, True)
             print(f"AI chooses column {col}")
 
         if is_valid_move(board, col):

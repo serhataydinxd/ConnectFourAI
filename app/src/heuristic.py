@@ -1,3 +1,15 @@
+DEBUG = True  # set to False to turn off debugging text
+
+POSITION_WEIGHTS = [
+    [3, 4, 5, 7, 5, 4, 3],
+    [4, 6, 8,10, 8, 6, 4],
+    [5, 8,11,13,11, 8, 5],
+    [5, 8,11,13,11, 8, 5],
+    [4, 6, 8,10, 8, 6, 4],
+    [3, 4, 5, 7, 5, 4, 3]
+]
+
+
 def evaluate_window(window, piece):
     score = 0
     opp = 2 if piece == 1 else 1
@@ -14,15 +26,27 @@ def evaluate_window(window, piece):
 
     return score
 
+def position_weight(board, piece):
+    score = 0
+    for r in range(6):
+        for c in range(7):
+            cell = board[r][c]
+            if cell == piece:
+                if DEBUG:
+                    print(f"AI piece at ({r},{c}) adds {POSITION_WEIGHTS[r][c]}")
+                score += POSITION_WEIGHTS[r][c]
+            elif cell != 0:
+                if DEBUG:
+                    print(f"OPP piece at ({r},{c}) subtracts {POSITION_WEIGHTS[r][c]}")
+                score -= POSITION_WEIGHTS[r][c]
+    return score
+
 
 def score_position(board, piece):
     score = 0
 
-    # Center preference (placeholder)
-    center_col = [row[3] for row in board]
-    score += center_col.count(piece) * 5
+    score += position_weight(board, piece)
 
-    # TODO: Add horizontal, vertical, diagonal scanning later
-    # (This matches your progress level)
+    score += evaluate_window(board, piece)
 
     return score
