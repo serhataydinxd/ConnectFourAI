@@ -14,15 +14,22 @@ def evaluate_window(window, piece):
     score = 0
     opp = 2 if piece == 1 else 1
 
-    # Placeholder scoring values (as in your progress)
-    if window.count(piece) == 3 and window.count(0) == 1:
-        score += 100
-    if window.count(piece) == 2 and window.count(0) == 2:
-        score += 10
+    # Offensive (The AI's opportunities)
+    if window.count(piece) == 4:
+        score += 100000  # Winning move
+    elif window.count(piece) == 3 and window.count(0) == 1:
+        score += 500  # Strong threat (4-in-a-row on next turn)
+    elif window.count(piece) == 2 and window.count(0) == 2:
+        score += 20  # Minor threat
 
-    # Defensive scoring
+    # Defensive (Blocking the opponent)
     if window.count(opp) == 3 and window.count(0) == 1:
-        score -= 80
+        # Crucial defense: Block opponent's immediate win.
+        # Needs to be a high score, but less than an AI win.
+        score -= 400
+
+        # You generally don't need to score 4 opponent pieces
+    # as the terminal check handles that loss.
 
     return score
 
@@ -42,11 +49,37 @@ def position_weight(board, piece):
     return score
 
 
+
+
 def score_position(board, piece):
     score = 0
 
     score += position_weight(board, piece)
 
-    score += evaluate_window(board, piece)
+    # Horizontal scoring
+    for r in range(6):
+        row_array = board[r]
+        for c in range(7 - 3):  # Iterate over possible starting columns
+            window = row_array[c:c + 4]
+            score += evaluate_window(window, piece)
+
+    # Vertical scoring
+    for c in range(7):
+        col_array = [board[r][c] for r in range(6)]
+        for r in range(6 - 3):
+            window = col_array[r:r + 4]
+            score += evaluate_window(window, piece)
+
+    # Positive slope diagonal scoring
+    for r in range(6 - 3):
+        for c in range(7 - 3):
+            window = [board[r + i][c + i] for i in range(4)]
+            score += evaluate_window(window, piece)
+
+    # Negative slope diagonal scoring
+    for r in range(6 - 3):
+        for c in range(3, 7):  # Start at column 3 and go left
+            window = [board[r + i][c - i] for i in range(4)]
+            score += evaluate_window(window, piece)
 
     return score
